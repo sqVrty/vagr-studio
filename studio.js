@@ -342,15 +342,8 @@
         sendBtn.textContent = label;
     }
 
-    function openedFromTelegram() {
-        if (tg && tg.initData) return true;
-        var hash = "";
-        try { hash = String(location.hash || ""); } catch (e) {}
-        return hash.indexOf("tgWebAppData=") !== -1;
-    }
-
     function sendViaTelegram(brief) {
-        if (!tg || typeof tg.sendData !== "function" || !openedFromTelegram()) {
+        if (!tg || !tg.sendData) {
             say("Откройте студию кнопкой под полем ввода в чате с ботом.");
             finish("Отправить в чат");
             return;
