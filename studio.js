@@ -19,8 +19,6 @@
     var balanceLine = document.getElementById("balanceLine");
     var levReadout = document.getElementById("levReadout");
     var levChips = document.getElementById("levChips");
-    var plateList = document.getElementById("plateList");
-    var plateEmpty = document.getElementById("plateEmpty");
     var tally = document.getElementById("tally");
     var tallyPnl = document.getElementById("tallyPnl");
     var tallyRoi = document.getElementById("tallyRoi");
@@ -41,6 +39,14 @@
     var termMinutesInput = document.getElementById("termMinutes");
     var bybitTerm = document.getElementById("bybitTerm");
     var platesReady = false;
+    var catalogPlates = [];
+    var step = "exchange";
+    var exchangeId = "";
+    var kindId = "";
+    var KINDS = {
+        bingx: [{ id: "card", title: "Карточка позиции", note: "Закрытая или активная. Медведь и бык." }],
+        bybit: [{ id: "card", title: "Карточка позиции", note: "ROI, реализованный P&L или P&L со сроком." }]
+    };
     var sending = false;
     var apiMode = document.body.hasAttribute("data-studio-api");
     var apiBase = document.body.getAttribute("data-studio-api") || "";
@@ -194,43 +200,139 @@
         say("");
     });
 
-    function renderPlates(items) {
-        plateList.querySelectorAll(".plate").forEach(function (node) { node.remove(); });
-        platesReady = items.length > 0;
-        plateEmpty.hidden = platesReady;
-        sendBtn.disabled = !platesReady;
-        sendHint.textContent = platesReady
-            ? "Изображение придёт в чат с ботом."
-            : "Отправка включится, когда появится хотя бы один макет.";
-        items.forEach(function (item) {
-            var label = document.createElement("label");
-            label.className = "plate";
-            var input = document.createElement("input");
-            input.type = "checkbox";
-            input.value = item.id;
-            input.addEventListener("change", function () {
-                say("");
-                syncCardState();
-            });
-            var text = document.createElement("span");
+    function kindsFor(id) {
+        return KINDS[id] || [{ id: "card", title: "Карточка позиции", note: "" }];
+    }
+
+    function plateById(id) {
+        for (var i = 0; i < catalogPlates.length; i++) {
+            if (catalogPlates[i].id === id) return catalogPlates[i];
+        }
+        return null;
+    }
+
+    function kindById(id) {
+        var kinds = kindsFor(exchangeId);
+        for (var i = 0; i < kinds.length; i++) {
+            if (kinds[i].id === id) return kinds[i];
+        }
+        return kinds[0];
+    }
+
+    function renderExchanges() {
+        var list = document.getElementById("exchangeList");
+        list.innerHTML = "";
+        catalogPlates.forEach(function (item) {
+            var button = document.createElement("button");
+            button.type = "button";
+            button.className = "pick";
             var title = document.createElement("strong");
             title.textContent = item.title || item.id;
-            var meta = document.createElement("em");
-            meta.textContent = item.id;
-            text.appendChild(title);
-            text.appendChild(meta);
-            label.appendChild(input);
-            label.appendChild(text);
-            plateList.appendChild(label);
+            var note = document.createElement("span");
+            note.textContent = kindsFor(item.id).length === 1
+                ? kindsFor(item.id)[0].note
+                : "Несколько карточек";
+            button.appendChild(title);
+            button.appendChild(note);
+            button.addEventListener("click", function () {
+                exchangeId = item.id;
+                kindId = "";
+                say("");
+                showStep("kind");
+            });
+            list.appendChild(button);
         });
-        syncCardState();
+    }
+
+    function renderKinds() {
+        var list = document.getElementById("kindList");
+        list.innerHTML = "";
+        kindsFor(exchangeId).forEach(function (kind) {
+            var button = document.createElement("button");
+            button.type = "button";
+            button.className = "pick";
+            var title = document.createElement("strong");
+            title.textContent = kind.title;
+            var note = document.createElement("span");
+            note.textContent = kind.note || "";
+            button.appendChild(title);
+            if (kind.note) button.appendChild(note);
+            button.addEventListener("click", function () {
+                kindId = kind.id;
+                say("");
+                showStep("form");
+            });
+            list.appendChild(button);
+        });
+    }
+
+    function crumbButton(label, target) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", function () {
+            say("");
+            showStep(target);
+        });
+        return button;
+    }
+
+    function renderCrumbs() {
+        var nav = document.getElementById("crumbs");
+        nav.innerHTML = "";
+        if (step === "exchange" || !exchangeId) {
+            nav.hidden = true;
+            return;
+        }
+        nav.hidden = false;
+        var plate = plateById(exchangeId);
+        nav.appendChild(crumbButton(plate ? (plate.title || exchangeId) : exchangeId, "exchange"));
+        if (step === "form") {
+            var sep = document.createElement("span");
+            sep.className = "sep";
+            sep.textContent = "/";
+            nav.appendChild(sep);
+            var kind = kindById(kindId);
+            nav.appendChild(crumbButton(kind.title, "kind"));
+            var sep2 = document.createElement("span");
+            sep2.className = "sep";
+            sep2.textContent = "/";
+            nav.appendChild(sep2);
+            var now = document.createElement("span");
+            now.className = "now";
+            now.textContent = "Параметры";
+            nav.appendChild(now);
+        }
+    }
+
+    function showStep(next) {
+        step = next;
+        document.getElementById("screenExchange").hidden = next !== "exchange";
+        document.getElementById("screenKind").hidden = next !== "kind";
+        form.hidden = next !== "form";
+        var title = document.getElementById("stepTitle");
+        var lede = document.getElementById("stepLede");
+        if (next === "exchange") {
+            title.textContent = "Биржа";
+            lede.textContent = "Одна биржа за раз. Карточка уйдёт в чат.";
+        } else if (next === "kind") {
+            renderKinds();
+            title.textContent = "Карточка";
+            lede.textContent = kindsFor(exchangeId).length === 1
+                ? "Пока здесь одна карточка."
+                : "Выберите, что собрать.";
+        } else {
+            title.textContent = "Параметры";
+            lede.textContent = "Заполните позицию. Готовый кадр вернётся в чат.";
+            syncCardState();
+        }
+        renderCrumbs();
+        window.scrollTo(0, 0);
     }
 
     function syncCardState() {
-        var bingx = selectedPlates().indexOf("bingx") !== -1;
-        var bybit = selectedPlates().indexOf("bybit") !== -1;
-        document.getElementById("cardState").hidden = !bingx;
-        document.getElementById("bybitState").hidden = !bybit;
+        document.getElementById("cardState").hidden = exchangeId !== "bingx";
+        document.getElementById("bybitState").hidden = exchangeId !== "bybit";
     }
 
     var catalogUrl = apiMode ? apiBase + "/api/catalog" : "catalog.json";
@@ -240,23 +342,19 @@
             return response.json();
         })
         .then(function (data) {
-            renderPlates(Array.isArray(data.plates) ? data.plates : []);
+            catalogPlates = Array.isArray(data.plates) ? data.plates : [];
+            platesReady = catalogPlates.length > 0;
+            if (!platesReady) {
+                document.getElementById("catalogError").hidden = false;
+                return;
+            }
+            renderExchanges();
+            showStep("exchange");
         })
         .catch(function () {
             platesReady = false;
-            sendBtn.disabled = true;
-            plateEmpty.hidden = false;
-            plateEmpty.querySelector(".plate-empty-title").textContent = "Список макетов не загрузился";
-            var detail = plateEmpty.querySelector("p:last-child");
-            if (detail) detail.textContent = "Проверьте соединение и откройте студию ещё раз.";
+            document.getElementById("catalogError").hidden = false;
         });
-
-    function selectedPlates() {
-        return Array.prototype.map.call(
-            plateList.querySelectorAll("input:checked"),
-            function (input) { return input.value; }
-        );
-    }
 
     function buildBrief() {
         var ok = true;
@@ -276,14 +374,8 @@
         if (!mark) { markInput.classList.add("is-invalid"); ok = false; }
         if (!margin) { marginInput.classList.add("is-invalid"); ok = false; }
 
-        var chosen = selectedPlates();
-        var plateMissing = platesReady && !chosen.length;
-        if (!ok && plateMissing) {
-            say("Заполните поля и отметьте макет.");
-            return null;
-        }
-        if (plateMissing) {
-            say("Отметьте хотя бы один макет.");
+        if (!exchangeId) {
+            say("Сначала выберите биржу.");
             return null;
         }
         if (!ok) {
@@ -299,7 +391,7 @@
             mark_price: mark,
             margin: margin,
             margin_kind: marginKind,
-            plates: chosen
+            plates: [exchangeId]
         };
         var signature = signatureInput.value.trim();
         if (signature) brief.signature = signature;
@@ -308,12 +400,12 @@
             if (balance) brief.balance = balance;
         }
         var backgrounds = [];
-        if (chosen.indexOf("bingx") !== -1) {
+        if (exchangeId === "bingx") {
             brief.position = position;
             brief.show_quote = showQuote;
             backgrounds = backgrounds.concat(background === "both" ? ["bear", "bull"] : [background]);
         }
-        if (chosen.indexOf("bybit") !== -1) {
+        if (exchangeId === "bybit") {
             brief.card_view = cardView;
             if (cardView === "term") {
                 var hours = parseCount(termHoursInput, 99999);
@@ -338,7 +430,7 @@
 
     function finish(label) {
         sending = false;
-        sendBtn.disabled = !platesReady;
+        sendBtn.disabled = false;
         sendBtn.textContent = label;
     }
 

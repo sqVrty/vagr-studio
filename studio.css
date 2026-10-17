@@ -83,6 +83,68 @@ h1 {
     font-size: 14px;
 }
 
+.crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 18px 0 0;
+    font-size: 13px;
+}
+
+.crumbs button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--sienna);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.crumbs .now {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.crumbs .sep { color: var(--muted); }
+
+.pick-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 28px;
+    border-top: 1px solid var(--ink);
+}
+
+.pick {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: 100%;
+    margin: 0;
+    padding: 16px 0 15px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.pick strong {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.pick span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
 .block { margin-top: 32px; }
 
 .block-head {

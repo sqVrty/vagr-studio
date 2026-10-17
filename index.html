@@ -22,12 +22,25 @@
                 </svg>
                 <span class="brand-name">Vagr</span>
             </div>
-            <p class="kicker">студия кадра</p>
-            <h1>Собрать кадр</h1>
-            <p class="lede">Параметры позиции уходят в бот. Готовый кадр возвращается в чат.</p>
+            <nav class="crumbs" id="crumbs" hidden></nav>
+            <p class="kicker" id="stepKicker">студия кадра</p>
+            <h1 id="stepTitle">Биржа</h1>
+            <p class="lede" id="stepLede">Одна биржа за раз. Карточка уйдёт в чат.</p>
         </header>
 
-        <form id="brief" novalidate>
+        <section id="screenExchange">
+            <div class="pick-list" id="exchangeList"></div>
+            <p class="plate-empty" id="catalogError" hidden>
+                <span class="plate-empty-title">Список макетов не загрузился</span>
+                Проверьте соединение и откройте студию ещё раз.
+            </p>
+        </section>
+
+        <section id="screenKind" hidden>
+            <div class="pick-list" id="kindList"></div>
+        </section>
+
+        <form id="brief" hidden novalidate>
             <section class="block">
                 <header class="block-head">
                     <span class="idx">01</span>
@@ -107,22 +120,9 @@
                 </label>
             </section>
 
-            <section class="block">
-                <header class="block-head">
-                    <span class="idx">05</span>
-                    <h2>Макеты</h2>
-                </header>
-                <div class="plate-list" id="plateList">
-                    <div class="plate-empty" id="plateEmpty">
-                        <p class="plate-empty-title">Макетов пока нет</p>
-                        <p>Форма и расчёт уже на месте. Макеты появятся в этом списке, когда мы их подключим.</p>
-                    </div>
-                </div>
-            </section>
-
             <section class="block" id="cardState" hidden>
                 <header class="block-head">
-                    <span class="idx">06</span>
+                    <span class="idx">05</span>
                     <h2>Карточка</h2>
                 </header>
                 <div class="switch" id="positionSwitch">
@@ -143,8 +143,8 @@
 
             <section class="block" id="bybitState" hidden>
                 <header class="block-head">
-                    <span class="idx">06</span>
-                    <h2>ByBit</h2>
+                    <span class="idx">05</span>
+                    <h2>Вид карточки</h2>
                 </header>
                 <div class="switch cols-3" id="bybitMode">
                     <button type="button" class="is-on" data-value="roi">ROI</button>
@@ -173,7 +173,7 @@
 
             <section class="tally" id="tally" hidden>
                 <header class="block-head">
-                    <span class="idx">07</span>
+                    <span class="idx">06</span>
                     <h2>Оценка</h2>
                 </header>
                 <dl>
@@ -192,8 +192,8 @@
                 </dl>
             </section>
 
-            <button type="submit" class="send" id="sendBtn" disabled>Отправить в чат</button>
-            <p class="send-hint" id="sendHint">Отправка включится, когда появится хотя бы один макет.</p>
+            <button type="submit" class="send" id="sendBtn">Отправить в чат</button>
+            <p class="send-hint" id="sendHint">Изображение придёт в чат с ботом.</p>
             <p class="notice" id="notice" hidden aria-live="polite"></p>
         </form>
     </main>
