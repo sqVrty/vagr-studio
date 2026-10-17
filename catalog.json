@@ -1,0 +1,12 @@
+{
+  "plates": [
+    {
+      "id": "bingx",
+      "title": "BingX"
+    },
+    {
+      "id": "bybit",
+      "title": "ByBit"
+    }
+  ]
+}

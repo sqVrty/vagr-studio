@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#e4ddd2">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='14' height='16' fill='none' stroke='%231c1916' stroke-width='1.6'/%3E%3Crect x='12' y='13' width='8' height='8' fill='%239a3412'/%3E%3C/svg%3E">
+    <title>Vagr</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="studio.css">
+</head>
+<body>
+    <main class="sheet">
+        <header class="mast">
+            <div class="brand">
+                <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="2" y="3" width="14" height="16" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <rect x="12" y="13" width="8" height="8" fill="#9a3412"/>
+                </svg>
+                <span class="brand-name">Vagr</span>
+            </div>
+            <p class="kicker">студия кадра</p>
+            <h1>Собрать кадр</h1>
+            <p class="lede">Параметры позиции уходят в бот. Готовый кадр возвращается в чат.</p>
+        </header>
+
+        <form id="brief" novalidate>
+            <section class="block">
+                <header class="block-head">
+                    <span class="idx">01</span>
+                    <h2>Сторона</h2>
+                </header>
+                <div class="switch" id="sideSwitch">
+                    <button type="button" class="is-on" data-value="long">Лонг</button>
+                    <button type="button" data-value="short">Шорт</button>
+                </div>
+            </section>
+
+            <section class="block">
+                <header class="block-head">
+                    <span class="idx">02</span>
+                    <h2>Инструмент</h2>
+                </header>
+                <div class="pair">
+                    <label class="line">
+                        <span>Пара</span>
+                        <input type="text" id="symbol" name="symbol" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="BTCUSDT">
+                    </label>
+                    <label class="line">
+                        <span>Подпись</span>
+                        <input type="text" id="signature" name="signature" maxlength="32" autocomplete="off" placeholder="необязательно">
+                    </label>
+                </div>
+            </section>
+
+            <section class="block">
+                <header class="block-head">
+                    <span class="idx">03</span>
+                    <h2>Плечо</h2>
+                </header>
+                <div class="lev">
+                    <p class="lev-readout" id="levReadout">20×</p>
+                    <div class="lev-controls">
+                        <button type="button" id="levDown" aria-label="Уменьшить плечо">−</button>
+                        <button type="button" id="levUp" aria-label="Увеличить плечо">+</button>
+                    </div>
+                </div>
+                <div class="chips" id="levChips">
+                    <button type="button" data-lev="5">5</button>
+                    <button type="button" data-lev="10">10</button>
+                    <button type="button" class="is-on" data-lev="20">20</button>
+                    <button type="button" data-lev="50">50</button>
+                    <button type="button" data-lev="100">100</button>
+                    <button type="button" data-lev="125">125</button>
+                </div>
+            </section>
+
+            <section class="block">
+                <header class="block-head">
+                    <span class="idx">04</span>
+                    <h2>Цены и маржа</h2>
+                </header>
+                <div class="pair">
+                    <label class="line">
+                        <span>Вход</span>
+                        <input type="text" inputmode="decimal" id="entry" autocomplete="off" placeholder="0,00">
+                    </label>
+                    <label class="line">
+                        <span>Выход</span>
+                        <input type="text" inputmode="decimal" id="mark" autocomplete="off" placeholder="0,00">
+                    </label>
+                </div>
+                <label class="line line-gap">
+                    <span>Маржа</span>
+                    <input type="text" inputmode="decimal" id="margin" autocomplete="off" placeholder="0,00">
+                </label>
+                <div class="switch switch-sub" id="marginSwitch">
+                    <button type="button" class="is-on" data-value="cross">Кросс</button>
+                    <button type="button" data-value="isolated">Изолированная</button>
+                </div>
+                <label class="line line-gap" id="balanceLine">
+                    <span>Баланс счёта</span>
+                    <input type="text" inputmode="decimal" id="balance" autocomplete="off" placeholder="для MMR, можно пустым">
+                </label>
+            </section>
+
+            <section class="block">
+                <header class="block-head">
+                    <span class="idx">05</span>
+                    <h2>Макеты</h2>
+                </header>
+                <div class="plate-list" id="plateList">
+                    <div class="plate-empty" id="plateEmpty">
+                        <p class="plate-empty-title">Макетов пока нет</p>
+                        <p>Форма и расчёт уже на месте. Макеты появятся в этом списке, когда мы их подключим.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="block" id="cardState" hidden>
+                <header class="block-head">
+                    <span class="idx">06</span>
+                    <h2>Карточка</h2>
+                </header>
+                <div class="switch" id="positionSwitch">
+                    <button type="button" class="is-on" data-value="closed">Закрыта</button>
+                    <button type="button" data-value="open">Активна</button>
+                </div>
+                <p class="field-note" id="positionNote">На кадре будет «Закрыто» и «Цена закрытия».</p>
+                <div class="switch switch-sub" id="quoteSwitch">
+                    <button type="button" class="is-on" data-value="off">Без USDT</button>
+                    <button type="button" data-value="on">PnL в USDT</button>
+                </div>
+                <div class="switch switch-sub cols-3" id="bgSwitch">
+                    <button type="button" data-value="bear">Медведь</button>
+                    <button type="button" data-value="bull">Бык</button>
+                    <button type="button" class="is-on" data-value="both">Оба</button>
+                </div>
+            </section>
+
+            <section class="block" id="bybitState" hidden>
+                <header class="block-head">
+                    <span class="idx">06</span>
+                    <h2>ByBit</h2>
+                </header>
+                <div class="switch cols-3" id="bybitMode">
+                    <button type="button" class="is-on" data-value="roi">ROI</button>
+                    <button type="button" data-value="pnl">Реализ. P&amp;L</button>
+                    <button type="button" data-value="term">P&amp;L и срок</button>
+                </div>
+                <p class="field-note" id="bybitNote">Крупная цифра — процент ROI. Плечо пишется как 70.0X.</p>
+                <div class="pair line-gap" id="bybitTerm" hidden>
+                    <label class="line">
+                        <span>Часы</span>
+                        <input type="text" inputmode="numeric" id="termHours" autocomplete="off" placeholder="0">
+                    </label>
+                    <label class="line">
+                        <span>Минуты</span>
+                        <input type="text" inputmode="numeric" id="termMinutes" autocomplete="off" placeholder="0">
+                    </label>
+                </div>
+                <div class="chips" id="bybitBg">
+                    <button type="button" data-bg="rocket">Ракета</button>
+                    <button type="button" data-bg="wallet">Кошелёк</button>
+                    <button type="button" data-bg="money_bag">Мешок</button>
+                    <button type="button" data-bg="magnifying_glass">Лупа</button>
+                    <button type="button" class="is-on" data-bg="all">Все</button>
+                </div>
+            </section>
+
+            <section class="tally" id="tally" hidden>
+                <header class="block-head">
+                    <span class="idx">07</span>
+                    <h2>Оценка</h2>
+                </header>
+                <dl>
+                    <div>
+                        <dt>PnL</dt>
+                        <dd id="tallyPnl">—</dd>
+                    </div>
+                    <div>
+                        <dt>ROI</dt>
+                        <dd id="tallyRoi">—</dd>
+                    </div>
+                    <div>
+                        <dt>Номинал</dt>
+                        <dd id="tallySize">—</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <button type="submit" class="send" id="sendBtn" disabled>Отправить в чат</button>
+            <p class="send-hint" id="sendHint">Отправка включится, когда появится хотя бы один макет.</p>
+            <p class="notice" id="notice" hidden aria-live="polite"></p>
+        </form>
+    </main>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="studio.js"></script>
+</body>
+</html>
