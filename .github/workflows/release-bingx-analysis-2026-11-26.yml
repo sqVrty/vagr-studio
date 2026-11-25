@@ -1,0 +1,33 @@
+name: Release BingX analysis on 2026-11-26
+
+on:
+  schedule:
+    # 19:21 Moscow (UTC+3). The step below limits this annual cron to 2026.
+    - cron: '21 16 26 11 *'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: bingx-analysis-release-2026-11-26
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge the tested revision and dispatch deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: da4b54069a49d937bf19bff0a44b379334dc4a2a
+          DEPLOY_WORKFLOW: pages.yml
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$(date -u +%F)" != 2026-11-26 ]]; then
+            echo 'This release is scheduled only for 2026-11-26.'
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/merges"             -f base=main -f head="$RELEASE_SHA"             -f commit_message='Release BingX trading analysis' >/dev/null
+          gh workflow run "$DEPLOY_WORKFLOW" --repo "$GITHUB_REPOSITORY" --ref main
