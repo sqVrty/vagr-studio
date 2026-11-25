@@ -41,6 +41,7 @@
         </section>
 
         <form id="brief" hidden novalidate>
+          <div id="positionFields">
             <section class="block">
                 <header class="block-head">
                     <span class="idx">01</span>
@@ -191,6 +192,27 @@
                     </div>
                 </dl>
             </section>
+
+          </div>
+          <section class="block" id="analysisFields" hidden>
+            <fieldset class="analysis-periods">
+              <legend>Периоды</legend>
+              <div class="analysis-period-options">
+                <label><input type="checkbox" name="periods" value="7" checked> 7 дней</label>
+                <label><input type="checkbox" name="periods" value="30"> 30 дней</label>
+                <label><input type="checkbox" name="periods" value="90"> 90 дней</label>
+              </div>
+              <p class="field-note">Для выбранных периодов используются значения из этой формы.</p>
+            </fieldset>
+            <div class="pair line-gap">
+                <label class="line"><span>Объём торгов (USDT)</span><input name="volume" inputmode="decimal" maxlength="24" required></label>
+                <label class="line"><span>Прибыльные сделки</span><input name="wins" inputmode="numeric" maxlength="24" required></label>
+                <label class="line"><span>Убыточные сделки</span><input name="losses" inputmode="numeric" maxlength="24" required></label>
+                <label class="line"><span>Прибыль (USDT)</span><input name="profit" inputmode="decimal" maxlength="24" required></label>
+                <label class="line"><span>Убыток (USDT)</span><input name="loss" inputmode="decimal" maxlength="24" required></label>
+                <label class="line"><span>Финансирование (USDT)</span><input name="funding" inputmode="decimal" maxlength="24" placeholder="0"></label>
+            </div>
+          </section>
 
             <button type="submit" class="send" id="sendBtn">Отправить в чат</button>
             <p class="send-hint" id="sendHint">Изображение придёт в чат с ботом.</p>

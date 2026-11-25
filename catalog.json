@@ -5,6 +5,11 @@
       "title": "BingX"
     },
     {
+      "id": "bingx_analysis",
+      "title": "Анализ торговли",
+      "exchange": "bingx"
+    },
+    {
       "id": "bybit",
       "title": "ByBit"
     }

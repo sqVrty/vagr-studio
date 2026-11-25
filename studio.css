@@ -426,3 +426,17 @@ h1 {
         border: 1px solid rgba(28, 25, 22, 0.08);
     }
 }
+
+.analysis-periods { margin: 0; padding: 0; border: 0; min-width: 0; }
+.analysis-periods legend { color: var(--muted); padding: 0; }
+.analysis-period-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.analysis-period-options label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+}
+.analysis-period-options input { accent-color: var(--sienna); }
