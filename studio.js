@@ -10,6 +10,7 @@
     }
 
     var form = document.getElementById("brief");
+    var analysisFields = document.getElementById("analysisFields");
     var symbolInput = document.getElementById("symbol");
     var signatureInput = document.getElementById("signature");
     var entryInput = document.getElementById("entry");
@@ -201,7 +202,10 @@
     });
 
     function kindsFor(id) {
-        return KINDS[id] || [{ id: "card", title: "Карточка позиции", note: "" }];
+        var kinds = KINDS[id] || [{ id: "card", title: "Карточка позиции", note: "" }];
+        return kinds.concat(catalogPlates.filter(function (plate) {
+            return plate.exchange === id;
+        }));
     }
 
     function plateById(id) {
@@ -222,7 +226,7 @@
     function renderExchanges() {
         var list = document.getElementById("exchangeList");
         list.innerHTML = "";
-        catalogPlates.forEach(function (item) {
+        catalogPlates.filter(function (item) { return !item.exchange; }).forEach(function (item) {
             var button = document.createElement("button");
             button.type = "button";
             button.className = "pick";
@@ -323,7 +327,9 @@
                 : "Выберите, что собрать.";
         } else {
             title.textContent = "Параметры";
-            lede.textContent = "Заполните позицию. Готовый кадр вернётся в чат.";
+            lede.textContent = kindId === "bingx_analysis"
+                ? "Укажите период и торговые показатели."
+                : "Заполните позицию. Готовый кадр вернётся в чат.";
             syncCardState();
         }
         renderCrumbs();
@@ -331,6 +337,9 @@
     }
 
     function syncCardState() {
+        var analysis = kindId === "bingx_analysis";
+        analysisFields.hidden = !analysis;
+        document.getElementById("positionFields").hidden = analysis;
         document.getElementById("cardState").hidden = exchangeId !== "bingx";
         document.getElementById("bybitState").hidden = exchangeId !== "bybit";
     }
@@ -356,7 +365,43 @@
             document.getElementById("catalogError").hidden = false;
         });
 
+    function buildAnalysis() {
+        var selected = analysisFields.querySelectorAll('input[name="periods"]:checked');
+        var periods = Array.from(selected, function (input) { return Number(input.value); });
+        if (!periods.length) {
+            say("Выберите хотя бы один период.");
+            analysisFields.querySelector('input[name="periods"]').focus();
+            return null;
+        }
+        var payload = { kind: "bingx_analysis", periods: periods };
+        var invalid = null;
+        analysisFields.querySelectorAll("input[inputmode]").forEach(function (input) {
+            var value = input.value.trim().replace(/\s/g, "").replace(",", ".");
+            if (!value && input.name === "funding") value = "0";
+            var numeric = input.inputMode === "numeric";
+            var valid = numeric ? /^\d{1,8}$/.test(value) : /^-?\d{1,12}(\.\d{1,8})?$/.test(value);
+            if (input.name === "volume" || input.name === "profit") valid = valid && Number(value) >= 0;
+            input.classList.toggle("is-invalid", !valid);
+            if (!valid && !invalid) invalid = input;
+            payload[input.name] = numeric ? Number(value) : value;
+        });
+        if (invalid) {
+            var label = invalid.closest("label").querySelector("span").textContent;
+            var hint = invalid.inputMode === "numeric"
+                ? "Введите целое неотрицательное число (до 8 цифр)."
+                : "Введите сумму (до 12 цифр до точки и до 8 после).";
+            if (invalid.name === "profit" || invalid.name === "volume") {
+                hint = "Введите неотрицательную сумму (до 12 цифр до точки и до 8 после).";
+            }
+            say(label + ". " + hint);
+            invalid.focus();
+            return null;
+        }
+        return payload;
+    }
+
     function buildBrief() {
+        if (kindId === "bingx_analysis") return buildAnalysis();
         var ok = true;
         [symbolInput, entryInput, markInput, marginInput].forEach(function (input) {
             input.classList.remove("is-invalid");
